@@ -1,0 +1,71 @@
+/*
+ * Copyright 2022 EPAM Systems
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+apply plugin: 'java-library'
+
+apply from: "${project.scripts_url}/${project.scripts_branch}/build-quality.gradle"
+apply from: "${project.scripts_url}/${project.scripts_branch}/release-commons.gradle"
+apply from: "${project.scripts_url}/${project.scripts_branch}/signing.gradle"
+apply from: "${project.scripts_url}/${project.scripts_branch}/jacoco.gradle"
+
+project.ext.limits = [
+        'instruction': 60,
+        'branch'     : 30,
+        'line'       : 60,
+        'complexity' : 45,
+        'method'     : 60,
+        'class'      : 83
+]
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+repositories {
+    mavenCentral()
+    maven { url "https://jitpack.io" }
+}
+
+dependencies {
+    api 'com.epam.reportportal:client-java:5.1.10'
+    api 'com.google.code.findbugs:jsr305:3.0.2'
+    api 'com.epam.reportportal:commons-model:5.0.0'
+
+    testImplementation('com.github.reportportal:agent-java-test-utils:236a68c')
+    testImplementation("org.junit.platform:junit-platform-runner:${junit5_runner_version}") {
+        exclude module: 'junit'
+    }
+    testImplementation "org.junit.jupiter:junit-jupiter-params:${junit5_version}"
+    testImplementation "org.junit.jupiter:junit-jupiter-engine:${junit5_version}"
+    testImplementation 'org.hamcrest:hamcrest-core:2.2'
+    testImplementation "org.mockito:mockito-core:${mockito_version}"
+    testImplementation "org.mockito:mockito-inline:${mockito_version}"
+}
+
+test {
+    useJUnitPlatform()
+    outputs.upToDateWhen { false }
+}
+
+wrapper {
+    gradleVersion = '5.4.1'
+}
+
+release {
+    git {
+        requireBranch = 'main'
+    }
+}
+
+build.dependsOn jacocoTestReport
