@@ -155,7 +155,7 @@ public class ReportPortalSelenideEventListener implements LogEventListener {
 		} else if (LogEvent.EventStatus.PASS.equals(currentLog.getStatus())) {
 			ofNullable(Launch.currentLaunch()).ifPresent(l -> l.getStepReporter().finishNestedStep());
 		} else {
-			ReportPortal.emitLog("Unable to process selenide event status: " + currentLog.getStatus(), LogLevel.WARN.name(), new Date());
+			ReportPortal.emitLog("Unable to process selenide event status, skipping it: " + currentLog.getStatus(), LogLevel.WARN.name(), new Date());
 		}
 	}
 }
