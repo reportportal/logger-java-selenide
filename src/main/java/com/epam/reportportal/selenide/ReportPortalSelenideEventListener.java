@@ -185,12 +185,14 @@ public class ReportPortalSelenideEventListener implements LogEventListener {
 			});
 			ofNullable(Launch.currentLaunch()).ifPresent(l -> l.getStepReporter().finishPreviousStep(ItemStatus.FAILED));
 		} else if (LogEvent.EventStatus.PASS.equals(currentLog.getStatus())) {
-			ofNullable(Launch.currentLaunch()).ifPresent(l -> l.getStepReporter().finishNestedStep());
+			ofNullable(Launch.currentLaunch()).ifPresent(l -> l.getStepReporter().finishPreviousStep());
 		} else {
-			ReportPortal.emitLog("Unable to process selenide event status, skipping it: " + currentLog.getStatus(),
+			ReportPortal.emitLog(
+					"Unable to process selenide event status, skipping it: " + currentLog.getStatus(),
 					LogLevel.WARN.name(),
 					Calendar.getInstance().getTime()
 			);
+			ofNullable(Launch.currentLaunch()).ifPresent(l -> l.getStepReporter().finishPreviousStep(ItemStatus.WARN));
 		}
 	}
 }
