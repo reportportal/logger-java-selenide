@@ -155,7 +155,7 @@ public class ReportPortalSelenideEventListenerTest {
 	}
 
 	@Test
-	@SuppressWarnings("unchecked" )
+	@SuppressWarnings("unchecked")
 	public void test_step_logging_failed_no_screenshots_sources() {
 		LogEvent logEvent = mock(SelenideLog.class);
 		when(logEvent.toString()).thenReturn(SELENIDE_LOG_STRING);
