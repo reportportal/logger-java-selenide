@@ -1,6 +1,8 @@
 # Changelog
 
 ## [Unreleased]
+
+## [5.1.1]
 ### Changed
 - Selenium log types are now `text/plain`, by @HardNorth
 ### Removed
