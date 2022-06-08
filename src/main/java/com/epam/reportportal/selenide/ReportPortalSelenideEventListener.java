@@ -42,6 +42,7 @@ import static java.util.Optional.ofNullable;
 
 public class ReportPortalSelenideEventListener implements LogEventListener {
 
+	public static final String UNABLE_TO_PROCESS_SELENIDE_EVENT_STATUS = "Unable to process selenide event status, skipping it: ";
 	public static final Function<String, String> DEFAULT_LOG_CONVERTER = log -> log;
 
 	private static final String SCREENSHOT_MESSAGE = "Screenshot";
@@ -117,8 +118,7 @@ public class ReportPortalSelenideEventListener implements LogEventListener {
 	}
 
 	private void attachBinary(@Nonnull String message, @Nonnull byte[] attachment, @Nonnull String type) {
-		ReportPortal.emitLog(
-				new ReportPortalMessage(ByteSource.wrap(attachment), type, message),
+		ReportPortal.emitLog(new ReportPortalMessage(ByteSource.wrap(attachment), type, message),
 				logLevel,
 				Calendar.getInstance().getTime()
 		);
@@ -132,8 +132,7 @@ public class ReportPortalSelenideEventListener implements LogEventListener {
 					attachBinary(SCREENSHOT_MESSAGE, screenshot, SELENIUM_SCREENSHOT_TYPE);
 				}
 			} catch (WebDriverException e) {
-				ReportPortal.emitLog(
-						"Unable to get WebDriver screenshot: " + e.getMessage(),
+				ReportPortal.emitLog("Unable to get WebDriver screenshot: " + e.getMessage(),
 						LogLevel.ERROR.name(),
 						Calendar.getInstance().getTime()
 				);
@@ -149,8 +148,7 @@ public class ReportPortalSelenideEventListener implements LogEventListener {
 					attachBinary(PAGE_SOURCE_MESSAGE, pageSource.getBytes(StandardCharsets.UTF_8), SELENIUM_PAGE_SOURCE_TYPE);
 				}
 			} catch (WebDriverException e) {
-				ReportPortal.emitLog(
-						"Unable to get WebDriver page source: " + e.getMessage(),
+				ReportPortal.emitLog("Unable to get WebDriver page source: " + e.getMessage(),
 						LogLevel.ERROR.name(),
 						Calendar.getInstance().getTime()
 				);
@@ -168,8 +166,7 @@ public class ReportPortalSelenideEventListener implements LogEventListener {
 			return;
 		}
 		if (LogEvent.EventStatus.FAIL.equals(currentLog.getStatus())) {
-			ReportPortal.emitLog(
-					ExceptionUtils.getStackTrace(currentLog.getError()),
+			ReportPortal.emitLog(ExceptionUtils.getStackTrace(currentLog.getError()),
 					LogLevel.ERROR.name(),
 					Calendar.getInstance().getTime()
 			);
@@ -185,12 +182,13 @@ public class ReportPortalSelenideEventListener implements LogEventListener {
 			});
 			ofNullable(Launch.currentLaunch()).ifPresent(l -> l.getStepReporter().finishPreviousStep(ItemStatus.FAILED));
 		} else if (LogEvent.EventStatus.PASS.equals(currentLog.getStatus())) {
-			ofNullable(Launch.currentLaunch()).ifPresent(l -> l.getStepReporter().finishNestedStep());
+			ofNullable(Launch.currentLaunch()).ifPresent(l -> l.getStepReporter().finishPreviousStep());
 		} else {
-			ReportPortal.emitLog("Unable to process selenide event status, skipping it: " + currentLog.getStatus(),
+			ReportPortal.emitLog(UNABLE_TO_PROCESS_SELENIDE_EVENT_STATUS + currentLog.getStatus(),
 					LogLevel.WARN.name(),
 					Calendar.getInstance().getTime()
 			);
+			ofNullable(Launch.currentLaunch()).ifPresent(l -> l.getStepReporter().finishPreviousStep(ItemStatus.WARN));
 		}
 	}
 }
