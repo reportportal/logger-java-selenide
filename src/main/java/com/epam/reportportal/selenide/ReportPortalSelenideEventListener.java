@@ -27,7 +27,6 @@ import com.epam.reportportal.message.ReportPortalMessage;
 import com.epam.reportportal.service.Launch;
 import com.epam.reportportal.service.ReportPortal;
 import com.google.common.io.ByteSource;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriverException;
@@ -50,7 +49,7 @@ public class ReportPortalSelenideEventListener implements LogEventListener {
 	private static final String SELENIUM_LOG_MESSAGE_PATTERN = "WebDriver logs of '%s' type";
 	private static final String SELENIUM_SCREENSHOT_TYPE = "image/png";
 	private static final String SELENIUM_PAGE_SOURCE_TYPE = "text/html";
-	private static final String SELENIUM_LOG_TYPE = "application/json";
+	private static final String SELENIUM_LOG_TYPE = "text/plain";
 
 	private final String logLevel;
 
@@ -166,10 +165,6 @@ public class ReportPortalSelenideEventListener implements LogEventListener {
 			return;
 		}
 		if (LogEvent.EventStatus.FAIL.equals(currentLog.getStatus())) {
-			ReportPortal.emitLog(ExceptionUtils.getStackTrace(currentLog.getError()),
-					LogLevel.ERROR.name(),
-					Calendar.getInstance().getTime()
-			);
 			if (screenshots) {
 				logScreenshot();
 			}

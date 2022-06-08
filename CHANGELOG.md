@@ -1,6 +1,10 @@
 # Changelog
 
 ## [Unreleased]
+### Changed
+- Selenium log types are now `text/plain`, by @HardNorth
+### Removed
+- Stack Trace logging in nested steps on failure, since it should be logged on higher level, by @HardNorth
 
 ## [5.1.0]
 ### Added

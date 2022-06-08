@@ -53,3 +53,19 @@ dependencies {
 ```
 
 ### Selenide configuration
+
+To start getting Selenide step logging in Report Portal you need to add the logger to `SelenideLogger` listeners. The best
+place for it is one which will be initialized at the earliest moment once during the test execution. E.G. a static initialization block in a
+base class for all tests:
+
+```java
+public class BaseTest {
+	static {
+		SelenideLogger.addListener("ReportPortal logger", new ReportPortalSelenideEventListener());
+	}
+}
+```
+
+### Logger configuration
+
+TBD
