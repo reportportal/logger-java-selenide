@@ -27,7 +27,6 @@ import com.epam.reportportal.message.ReportPortalMessage;
 import com.epam.reportportal.service.Launch;
 import com.epam.reportportal.service.ReportPortal;
 import com.google.common.io.ByteSource;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriverException;
@@ -166,10 +165,6 @@ public class ReportPortalSelenideEventListener implements LogEventListener {
 			return;
 		}
 		if (LogEvent.EventStatus.FAIL.equals(currentLog.getStatus())) {
-			ReportPortal.emitLog(ExceptionUtils.getStackTrace(currentLog.getError()),
-					LogLevel.ERROR.name(),
-					Calendar.getInstance().getTime()
-			);
 			if (screenshots) {
 				logScreenshot();
 			}
