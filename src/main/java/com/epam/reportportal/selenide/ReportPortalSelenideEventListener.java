@@ -50,7 +50,7 @@ public class ReportPortalSelenideEventListener implements LogEventListener {
 	private static final String SELENIUM_LOG_MESSAGE_PATTERN = "WebDriver logs of '%s' type";
 	private static final String SELENIUM_SCREENSHOT_TYPE = "image/png";
 	private static final String SELENIUM_PAGE_SOURCE_TYPE = "text/html";
-	private static final String SELENIUM_LOG_TYPE = "application/json";
+	private static final String SELENIUM_LOG_TYPE = "text/plain";
 
 	private final String logLevel;
 
