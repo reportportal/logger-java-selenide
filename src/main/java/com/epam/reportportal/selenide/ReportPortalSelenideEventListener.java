@@ -40,8 +40,7 @@ import static java.util.Optional.ofNullable;
 
 public class ReportPortalSelenideEventListener implements LogEventListener {
 
-	public static final String UNABLE_TO_PROCESS_SELENIDE_EVENT_STATUS = "Unable to process selenide event status, skipping it: ";
-	public static final Function<String, String> DEFAULT_LOG_CONVERTER = log -> log;
+	public static final Function<String, String> DEFAULT_STEP_NAME_CONVERTER = log -> log;
 
 	private static final String SCREENSHOT_MESSAGE = "Screenshot";
 	private static final String PAGE_SOURCE_MESSAGE = "Page source";
@@ -65,7 +64,7 @@ public class ReportPortalSelenideEventListener implements LogEventListener {
 	}
 
 	public ReportPortalSelenideEventListener(@Nonnull LogLevel defaultLogLevel) {
-		this(defaultLogLevel, DEFAULT_LOG_CONVERTER);
+		this(defaultLogLevel, DEFAULT_STEP_NAME_CONVERTER);
 	}
 
 	public ReportPortalSelenideEventListener() {
@@ -178,7 +177,7 @@ public class ReportPortalSelenideEventListener implements LogEventListener {
 		} else if (LogEvent.EventStatus.PASS.equals(currentLog.getStatus())) {
 			ofNullable(Launch.currentLaunch()).ifPresent(l -> l.getStepReporter().finishPreviousStep());
 		} else {
-			ReportPortal.emitLog(UNABLE_TO_PROCESS_SELENIDE_EVENT_STATUS + currentLog.getStatus(),
+			ReportPortal.emitLog("Unable to process selenide event status, skipping it: " + currentLog.getStatus(),
 					LogLevel.WARN.name(),
 					Calendar.getInstance().getTime()
 			);
