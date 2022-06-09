@@ -11,9 +11,9 @@ The latest version: $LATEST_VERSION. Please use `Maven Central` link above to ge
 
 ## Overview
 
-Selenide step logger for Report Portal
-
-Description TBD
+Selenide step logging listener for Report Portal. The listener listen for Selenide log events and send them to Report Portal as steps.
+It has ability to log screenshots and page sources on failure, this is enabled by default. Also, it is possible to attach different types of
+WebDriver logs on failure.
 
 ## Configuration
 
@@ -61,11 +61,50 @@ base class for all tests:
 ```java
 public class BaseTest {
 	static {
-		SelenideLogger.addListener("ReportPortal logger", new ReportPortalSelenideEventListener());
+		SelenideLogger.addListener("Report Portal logger", new ReportPortalSelenideEventListener());
 	}
 }
 ```
 
 ### Logger configuration
 
-TBD
+#### Screenshots and page sources
+
+The logger has screenshots and page sources logging enabled by default. It logs them inside the step on every failure. To disable / enable
+this behavior we have separate setters methods in the logger.
+E.G.:
+```java
+public class BaseTest {
+	static {
+		SelenideLogger.addListener("Report Portal logger", 
+                new ReportPortalSelenideEventListener().logScreenshots(false).logPageSources(false));
+	}
+}
+```
+This disables both: screenshot and page sources logging.
+
+#### Selenium logs
+
+The logger can also attach Selenium logs on step failure. To enable it you need to call specific setter method inside the listener and
+bypass desired log type and level:
+```java
+public class BaseTest {
+	static {
+		SelenideLogger.addListener("Report Portal logger",
+				new ReportPortalSelenideEventListener().enableSeleniumLogs(LogType.BROWSER, Level.FINER));
+	}
+}
+```
+
+#### Step name sanitizing
+
+If you need to hide some secret data from you step logs you can do this by specifying step name converter in logger constructor.
+```java
+public class BaseTest {
+	static {
+		SelenideLogger.addListener("Report Portal logger", 
+                new ReportPortalSelenideEventListener(LogLevel.INFO, l -> l.replaceAll("secret_token=[^&]*", "secret_token=<removed>")));
+	}
+}
+```
+
