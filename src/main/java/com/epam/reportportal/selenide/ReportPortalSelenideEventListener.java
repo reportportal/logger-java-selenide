@@ -29,7 +29,6 @@ import com.epam.reportportal.service.ReportPortal;
 import com.google.common.io.ByteSource;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
-import org.openqa.selenium.WebDriverException;
 
 import javax.annotation.Nonnull;
 import java.nio.charset.StandardCharsets;
@@ -130,7 +129,7 @@ public class ReportPortalSelenideEventListener implements LogEventListener {
 				if ((screenshot = ((TakesScreenshot) WebDriverRunner.getWebDriver()).getScreenshotAs(OutputType.BYTES)) != null) {
 					attachBinary(SCREENSHOT_MESSAGE, screenshot, SELENIUM_SCREENSHOT_TYPE);
 				}
-			} catch (WebDriverException e) {
+			} catch (Exception e) {
 				ReportPortal.emitLog("Unable to get WebDriver screenshot: " + e.getMessage(),
 						LogLevel.ERROR.name(),
 						Calendar.getInstance().getTime()
@@ -146,7 +145,7 @@ public class ReportPortalSelenideEventListener implements LogEventListener {
 				if ((pageSource = WebDriverRunner.getWebDriver().getPageSource()) != null) {
 					attachBinary(PAGE_SOURCE_MESSAGE, pageSource.getBytes(StandardCharsets.UTF_8), SELENIUM_PAGE_SOURCE_TYPE);
 				}
-			} catch (WebDriverException e) {
+			} catch (Exception e) {
 				ReportPortal.emitLog("Unable to get WebDriver page source: " + e.getMessage(),
 						LogLevel.ERROR.name(),
 						Calendar.getInstance().getTime()
