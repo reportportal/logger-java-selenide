@@ -120,17 +120,16 @@ public class ReportPortalSelenideEventListenerTest {
 		when(webDriver.getScreenshotAs(eq(OutputType.BYTES))).thenReturn(image);
 		when(webDriver.getPageSource()).thenReturn(page);
 
+		ReportPortalSelenideEventListener listener = new ReportPortalSelenideEventListener();
+		runEvent(listener::beforeEvent, logEvent);
+		verify(context, noInteractions()).emit(any(Function.class));
+		verify(stepReporter).sendStep(eq(ItemStatus.INFO), eq(SELENIDE_LOG_STRING));
+
+		when(logEvent.getStatus()).thenReturn(LogEvent.EventStatus.FAIL);
+
 		try (MockedStatic<WebDriverRunner> driverMockedStatic = Mockito.mockStatic(WebDriverRunner.class)) {
 			driverMockedStatic.when(WebDriverRunner::hasWebDriverStarted).thenReturn(true);
 			driverMockedStatic.when(WebDriverRunner::getWebDriver).thenReturn(webDriver);
-
-			ReportPortalSelenideEventListener listener = new ReportPortalSelenideEventListener();
-			runEvent(listener::beforeEvent, logEvent);
-			verify(context, noInteractions()).emit(any(Function.class));
-
-			verify(stepReporter).sendStep(eq(ItemStatus.INFO), eq(SELENIDE_LOG_STRING));
-
-			when(logEvent.getStatus()).thenReturn(LogEvent.EventStatus.FAIL);
 
 			List<Function<String, SaveLogRQ>> logs = runEventCapture(listener::afterEvent, logEvent);
 			verify(stepReporter).finishPreviousStep(eq(ItemStatus.FAILED));
@@ -225,6 +224,66 @@ public class ReportPortalSelenideEventListenerTest {
 				assertThat(browserLog.getFile().getContentType(), equalTo("text/plain"));
 				assertThat(browserLog.getFile().getContent(), equalTo(BROWSER_LOG.getBytes(StandardCharsets.UTF_8)));
 			}
+		}
+	}
+
+	@Test
+	@SuppressWarnings({ "ResultOfMethodCallIgnored", "unchecked" })
+	public void test_step_logging_failed_screenshot_exception() {
+		String exceptionMessage = "my exception message";
+		LogEvent logEvent = mock(SelenideLog.class);
+		when(logEvent.toString()).thenReturn(SELENIDE_LOG_STRING);
+		ReportPortalSelenideEventListener listener = new ReportPortalSelenideEventListener().logPageSources(false);
+		runEvent(listener::beforeEvent, logEvent);
+		verify(context, noInteractions()).emit(any(Function.class));
+		verify(stepReporter).sendStep(eq(ItemStatus.INFO), eq(SELENIDE_LOG_STRING));
+
+		when(logEvent.getStatus()).thenReturn(LogEvent.EventStatus.FAIL);
+
+		RemoteWebDriver webDriver = mock(RemoteWebDriver.class);
+		when(webDriver.getScreenshotAs(any(OutputType.class))).thenThrow(new RuntimeException(exceptionMessage));
+		try (MockedStatic<WebDriverRunner> driverMockedStatic = Mockito.mockStatic(WebDriverRunner.class)) {
+			driverMockedStatic.when(WebDriverRunner::hasWebDriverStarted).thenReturn(true);
+			driverMockedStatic.when(WebDriverRunner::getWebDriver).thenReturn(webDriver);
+
+			List<Function<String, SaveLogRQ>> logs = runEventCapture(listener::afterEvent, logEvent);
+			verify(stepReporter).finishPreviousStep(eq(ItemStatus.FAILED));
+			assertThat(logs, hasSize(1));
+
+			SaveLogRQ screenshotLog = logs.get(0).apply("test");
+			assertThat(screenshotLog.getLevel(), equalTo(LogLevel.ERROR.name()));
+			assertThat(screenshotLog.getFile(), nullValue());
+			assertThat(screenshotLog.getMessage(), equalTo("Unable to get WebDriver screenshot: " + exceptionMessage));
+		}
+	}
+
+	@Test
+	@SuppressWarnings({ "ResultOfMethodCallIgnored", "unchecked" })
+	public void test_step_logging_failed_page_source_exception() {
+		String exceptionMessage = "my exception message";
+		LogEvent logEvent = mock(SelenideLog.class);
+		when(logEvent.toString()).thenReturn(SELENIDE_LOG_STRING);
+		ReportPortalSelenideEventListener listener = new ReportPortalSelenideEventListener().logScreenshots(false);
+		runEvent(listener::beforeEvent, logEvent);
+		verify(context, noInteractions()).emit(any(Function.class));
+		verify(stepReporter).sendStep(eq(ItemStatus.INFO), eq(SELENIDE_LOG_STRING));
+
+		when(logEvent.getStatus()).thenReturn(LogEvent.EventStatus.FAIL);
+
+		RemoteWebDriver webDriver = mock(RemoteWebDriver.class);
+		when(webDriver.getPageSource()).thenThrow(new RuntimeException(exceptionMessage));
+		try (MockedStatic<WebDriverRunner> driverMockedStatic = Mockito.mockStatic(WebDriverRunner.class)) {
+			driverMockedStatic.when(WebDriverRunner::hasWebDriverStarted).thenReturn(true);
+			driverMockedStatic.when(WebDriverRunner::getWebDriver).thenReturn(webDriver);
+
+			List<Function<String, SaveLogRQ>> logs = runEventCapture(listener::afterEvent, logEvent);
+			verify(stepReporter).finishPreviousStep(eq(ItemStatus.FAILED));
+			assertThat(logs, hasSize(1));
+
+			SaveLogRQ pageSourceLog = logs.get(0).apply("test");
+			assertThat(pageSourceLog.getLevel(), equalTo(LogLevel.ERROR.name()));
+			assertThat(pageSourceLog.getFile(), nullValue());
+			assertThat(pageSourceLog.getMessage(), equalTo("Unable to get WebDriver page source: " + exceptionMessage));
 		}
 	}
 }

@@ -29,7 +29,6 @@ import com.epam.reportportal.service.ReportPortal;
 import com.google.common.io.ByteSource;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
-import org.openqa.selenium.WebDriverException;
 
 import javax.annotation.Nonnull;
 import java.nio.charset.StandardCharsets;
@@ -39,10 +38,20 @@ import java.util.logging.Level;
 
 import static java.util.Optional.ofNullable;
 
+/**
+ * Selenide step logging listener for Report Portal.
+ * <p>
+ * The listener listen for Selenide log events and send them to Report Portal as steps. It has ability to log screenshots and page sources
+ * on failure, this is enabled by default. Also, it is possible to attach different types of WebDriver logs on failure.
+ * <p>
+ * Basic usage:
+ * <pre>
+ *     SelenideLogger.addListener("Report Portal logger", new ReportPortalSelenideEventListener());
+ * </pre>
+ */
 public class ReportPortalSelenideEventListener implements LogEventListener {
 
-	public static final String UNABLE_TO_PROCESS_SELENIDE_EVENT_STATUS = "Unable to process selenide event status, skipping it: ";
-	public static final Function<String, String> DEFAULT_LOG_CONVERTER = log -> log;
+	public static final Function<String, String> DEFAULT_STEP_NAME_CONVERTER = log -> log;
 
 	private static final String SCREENSHOT_MESSAGE = "Screenshot";
 	private static final String PAGE_SOURCE_MESSAGE = "Page source";
@@ -60,44 +69,95 @@ public class ReportPortalSelenideEventListener implements LogEventListener {
 	private boolean screenshots = true;
 	private boolean pageSources = true;
 
+	/**
+	 * Create listener instance with specified log level and step name converter.
+	 *
+	 * @param defaultLogLevel logging level of attachments
+	 * @param stepConverter   step name converter, suitable to sanitize step string from secret data
+	 */
 	public ReportPortalSelenideEventListener(@Nonnull LogLevel defaultLogLevel, Function<String, String> stepConverter) {
 		logLevel = defaultLogLevel.name();
 		converter = stepConverter;
 	}
 
+	/**
+	 * Create listener instance with specified log level.
+	 *
+	 * @param defaultLogLevel logging level of attachments
+	 */
 	public ReportPortalSelenideEventListener(@Nonnull LogLevel defaultLogLevel) {
-		this(defaultLogLevel, DEFAULT_LOG_CONVERTER);
+		this(defaultLogLevel, DEFAULT_STEP_NAME_CONVERTER);
 	}
 
+	/**
+	 * Create listener instance with default attachment {@link LogLevel}: "INFO".
+	 */
 	public ReportPortalSelenideEventListener() {
 		this(LogLevel.INFO);
 	}
 
+	/**
+	 * Set screenshot on failure logging enable/disable. Enabled by default.
+	 *
+	 * @param logScreenshots use <code>false</code> to disable screenshot logging
+	 * @return self instance for convenience
+	 */
 	public ReportPortalSelenideEventListener logScreenshots(boolean logScreenshots) {
 		this.screenshots = logScreenshots;
 		return this;
 	}
 
+	/**
+	 * Set page sources on failure logging enable/disable. Enabled by default.
+	 *
+	 * @param logPageSources use <code>false</code> to disable page sources logging
+	 * @return self instance for convenience
+	 */
 	public ReportPortalSelenideEventListener logPageSources(boolean logPageSources) {
 		this.pageSources = logPageSources;
 		return this;
 	}
 
+	/**
+	 * Enable certain selenium log attach on failure.
+	 *
+	 * @param logType  a string from {@link org.openqa.selenium.logging.LogType} describing desired log type to be logged
+	 * @param logLevel desired log level to see in attachment
+	 * @return self instance for convenience
+	 */
 	public ReportPortalSelenideEventListener enableSeleniumLogs(@Nonnull String logType, @Nonnull Level logLevel) {
 		seleniumLogTypes.put(logType, logLevel);
 		return this;
 	}
 
+	/**
+	 * Disable certain selenium log attach on failure.
+	 *
+	 * @param logType a string from {@link org.openqa.selenium.logging.LogType} describing desired log type to be muted
+	 * @return self instance for convenience
+	 */
 	public ReportPortalSelenideEventListener disableSeleniumLogs(@Nonnull String logType) {
 		seleniumLogTypes.remove(logType);
 		return this;
 	}
 
+	/**
+	 * Enable custom selenide step logging.
+	 *
+	 * @param selenideLogType type of selenide event to enable logging
+	 * @return self instance for convenience
+	 */
 	public ReportPortalSelenideEventListener enableSelenideLogs(@Nonnull Class<? extends LogEvent> selenideLogType) {
 		selenideLogTypes.add(selenideLogType);
 		return this;
 	}
 
+	/**
+	 * Disable custom selenide step logging.
+	 *
+	 * @param selenideLogType type of selenide event to mute
+	 * @return self instance for convenience
+	 */
 	public ReportPortalSelenideEventListener disableSelenideLogs(@Nonnull Class<? extends LogEvent> selenideLogType) {
 		selenideLogTypes.remove(selenideLogType);
 		return this;
@@ -130,7 +190,7 @@ public class ReportPortalSelenideEventListener implements LogEventListener {
 				if ((screenshot = ((TakesScreenshot) WebDriverRunner.getWebDriver()).getScreenshotAs(OutputType.BYTES)) != null) {
 					attachBinary(SCREENSHOT_MESSAGE, screenshot, SELENIUM_SCREENSHOT_TYPE);
 				}
-			} catch (WebDriverException e) {
+			} catch (Exception e) {
 				ReportPortal.emitLog("Unable to get WebDriver screenshot: " + e.getMessage(),
 						LogLevel.ERROR.name(),
 						Calendar.getInstance().getTime()
@@ -146,7 +206,7 @@ public class ReportPortalSelenideEventListener implements LogEventListener {
 				if ((pageSource = WebDriverRunner.getWebDriver().getPageSource()) != null) {
 					attachBinary(PAGE_SOURCE_MESSAGE, pageSource.getBytes(StandardCharsets.UTF_8), SELENIUM_PAGE_SOURCE_TYPE);
 				}
-			} catch (WebDriverException e) {
+			} catch (Exception e) {
 				ReportPortal.emitLog("Unable to get WebDriver page source: " + e.getMessage(),
 						LogLevel.ERROR.name(),
 						Calendar.getInstance().getTime()
@@ -179,7 +239,7 @@ public class ReportPortalSelenideEventListener implements LogEventListener {
 		} else if (LogEvent.EventStatus.PASS.equals(currentLog.getStatus())) {
 			ofNullable(Launch.currentLaunch()).ifPresent(l -> l.getStepReporter().finishPreviousStep());
 		} else {
-			ReportPortal.emitLog(UNABLE_TO_PROCESS_SELENIDE_EVENT_STATUS + currentLog.getStatus(),
+			ReportPortal.emitLog("Unable to process selenide event status, skipping it: " + currentLog.getStatus(),
 					LogLevel.WARN.name(),
 					Calendar.getInstance().getTime()
 			);
