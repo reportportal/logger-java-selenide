@@ -7,11 +7,11 @@
 [![stackoverflow](https://img.shields.io/badge/reportportal-stackoverflow-orange.svg?style=flat)](http://stackoverflow.com/questions/tagged/reportportal)
 [![Build with Love](https://img.shields.io/badge/build%20with-❤%EF%B8%8F%E2%80%8D-lightgrey.svg)](http://reportportal.io?style=flat)
 
-The latest version: 5.1.1. Please use `Maven Central` link above to get the agent.
+The latest version: 5.1.2. Please use `Maven Central` link above to get the agent.
 
 ## Overview
 
-Selenide step logging listener for Report Portal. The listener listen for Selenide log events and send them to Report Portal as steps. 
+Selenide step logging listener for Report Portal. The listener listen for Selenide log events and send them to Report Portal as steps.
 It has ability to log screenshots and page sources on failure, this is enabled by default. Also, it is possible to attach different types of
 WebDriver logs on failure.
 
@@ -34,7 +34,7 @@ You need to add the logger as one of your dependencies in Maven or Gradle.
         <dependency>
             <groupId>com.epam.reportportal</groupId>
             <artifactId>logger-java-selenide</artifactId>
-            <version>5.1.1</version>
+            <version>5.1.2</version>
         </dependency>
     </dependencies>
 
@@ -48,7 +48,7 @@ You need to add the logger as one of your dependencies in Maven or Gradle.
 
 ```groovy
 dependencies {
-    testCompile 'com.epam.reportportal:logger-java-selenide:5.1.1'
+    testCompile 'com.epam.reportportal:logger-java-selenide:5.1.2'
 }
 ```
 
@@ -107,3 +107,4 @@ public class BaseTest {
 	}
 }
 ```
+
