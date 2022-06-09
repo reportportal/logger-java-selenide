@@ -1,6 +1,8 @@
 # Changelog
 
 ## [Unreleased]
+
+## [5.1.2]
 ### Changed
 - Broader catch in screenshot and page source getting methods to avoid throwing any exceptions in logger, by @HardNorth
 - Constant names refactoring, by @HardNorth
