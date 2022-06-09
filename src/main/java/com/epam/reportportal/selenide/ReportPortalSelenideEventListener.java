@@ -38,6 +38,17 @@ import java.util.logging.Level;
 
 import static java.util.Optional.ofNullable;
 
+/**
+ * Selenide step logging listener for Report Portal.
+ * <p>
+ * The listener listen for Selenide log events and send them to Report Portal as steps. It has ability to log screenshots and page sources
+ * on failure, this is enabled by default. Also, it is possible to attach different types of WebDriver logs on failure.
+ * <p>
+ * Basic usage:
+ * <pre>
+ *     SelenideLogger.addListener("Report Portal logger", new ReportPortalSelenideEventListener());
+ * </pre>
+ */
 public class ReportPortalSelenideEventListener implements LogEventListener {
 
 	public static final Function<String, String> DEFAULT_STEP_NAME_CONVERTER = log -> log;
@@ -58,44 +69,95 @@ public class ReportPortalSelenideEventListener implements LogEventListener {
 	private boolean screenshots = true;
 	private boolean pageSources = true;
 
+	/**
+	 * Create listener instance with specified log level and step name converter.
+	 *
+	 * @param defaultLogLevel logging level of attachments
+	 * @param stepConverter   step name converter, suitable to sanitize step string from secret data
+	 */
 	public ReportPortalSelenideEventListener(@Nonnull LogLevel defaultLogLevel, Function<String, String> stepConverter) {
 		logLevel = defaultLogLevel.name();
 		converter = stepConverter;
 	}
 
+	/**
+	 * Create listener instance with specified log level.
+	 *
+	 * @param defaultLogLevel logging level of attachments
+	 */
 	public ReportPortalSelenideEventListener(@Nonnull LogLevel defaultLogLevel) {
 		this(defaultLogLevel, DEFAULT_STEP_NAME_CONVERTER);
 	}
 
+	/**
+	 * Create listener instance with default attachment {@link LogLevel}: "INFO".
+	 */
 	public ReportPortalSelenideEventListener() {
 		this(LogLevel.INFO);
 	}
 
+	/**
+	 * Set screenshot on failure logging enable/disable. Enabled by default.
+	 *
+	 * @param logScreenshots use <code>false</code> to disable screenshot logging
+	 * @return self instance for convenience
+	 */
 	public ReportPortalSelenideEventListener logScreenshots(boolean logScreenshots) {
 		this.screenshots = logScreenshots;
 		return this;
 	}
 
+	/**
+	 * Set page sources on failure logging enable/disable. Enabled by default.
+	 *
+	 * @param logPageSources use <code>false</code> to disable page sources logging
+	 * @return self instance for convenience
+	 */
 	public ReportPortalSelenideEventListener logPageSources(boolean logPageSources) {
 		this.pageSources = logPageSources;
 		return this;
 	}
 
+	/**
+	 * Enable certain selenium log attach on failure.
+	 *
+	 * @param logType  a string from {@link org.openqa.selenium.logging.LogType} describing desired log type to be logged
+	 * @param logLevel desired log level to see in attachment
+	 * @return self instance for convenience
+	 */
 	public ReportPortalSelenideEventListener enableSeleniumLogs(@Nonnull String logType, @Nonnull Level logLevel) {
 		seleniumLogTypes.put(logType, logLevel);
 		return this;
 	}
 
+	/**
+	 * Disable certain selenium log attach on failure.
+	 *
+	 * @param logType a string from {@link org.openqa.selenium.logging.LogType} describing desired log type to be muted
+	 * @return self instance for convenience
+	 */
 	public ReportPortalSelenideEventListener disableSeleniumLogs(@Nonnull String logType) {
 		seleniumLogTypes.remove(logType);
 		return this;
 	}
 
+	/**
+	 * Enable custom selenide step logging.
+	 *
+	 * @param selenideLogType type of selenide event to enable logging
+	 * @return self instance for convenience
+	 */
 	public ReportPortalSelenideEventListener enableSelenideLogs(@Nonnull Class<? extends LogEvent> selenideLogType) {
 		selenideLogTypes.add(selenideLogType);
 		return this;
 	}
 
+	/**
+	 * Disable custom selenide step logging.
+	 *
+	 * @param selenideLogType type of selenide event to mute
+	 * @return self instance for convenience
+	 */
 	public ReportPortalSelenideEventListener disableSelenideLogs(@Nonnull Class<? extends LogEvent> selenideLogType) {
 		selenideLogTypes.remove(selenideLogType);
 		return this;
