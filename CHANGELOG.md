@@ -1,6 +1,9 @@
 # Changelog
 
 ## [Unreleased]
+### Changed
+- Client version updated on [5.1.16](https://github.com/reportportal/client-java/releases/tag/5.1.16), by @HardNorth
+- Selenide version updated on 6.6.3 to address vulnerabilities
 
 ## [5.1.2]
 ### Changed
