@@ -7,7 +7,7 @@
 [![stackoverflow](https://img.shields.io/badge/reportportal-stackoverflow-orange.svg?style=flat)](http://stackoverflow.com/questions/tagged/reportportal)
 [![Build with Love](https://img.shields.io/badge/build%20with-❤%EF%B8%8F%E2%80%8D-lightgrey.svg)](http://reportportal.io?style=flat)
 
-The latest version: 5.1.2. Please use `Maven Central` link above to get the agent.
+The latest version: 5.1.3. Please use `Maven Central` link above to get the agent.
 
 ## Overview
 
@@ -34,7 +34,7 @@ You need to add the logger as one of your dependencies in Maven or Gradle.
         <dependency>
             <groupId>com.epam.reportportal</groupId>
             <artifactId>logger-java-selenide</artifactId>
-            <version>5.1.2</version>
+            <version>5.1.3</version>
         </dependency>
     </dependencies>
 
@@ -48,7 +48,7 @@ You need to add the logger as one of your dependencies in Maven or Gradle.
 
 ```groovy
 dependencies {
-    testCompile 'com.epam.reportportal:logger-java-selenide:5.1.2'
+    testCompile 'com.epam.reportportal:logger-java-selenide:5.1.3'
 }
 ```
 
