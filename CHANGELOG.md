@@ -1,6 +1,10 @@
 # Changelog
 
 ## [Unreleased]
+### Changed
+- Client version updated on [5.2.0](https://github.com/reportportal/client-java/releases/tag/5.2.0), by @HardNorth
+- Selenide version updated on 6.18.0 to address vulnerabilities, by @HardNorth
+- Selenide dependency marked as `implementation` to force users specify their own selenide versions, by @HardNorth
 
 ## [5.1.4]
 ### Changed
@@ -9,7 +13,7 @@
 ## [5.1.3]
 ### Changed
 - Client version updated on [5.1.16](https://github.com/reportportal/client-java/releases/tag/5.1.16), by @HardNorth
-- Selenide version updated on 6.12.3 to address vulnerabilities
+- Selenide version updated on 6.12.3 to address vulnerabilities, by @HardNorth
 
 ## [5.1.2]
 ### Changed
