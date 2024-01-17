@@ -26,7 +26,7 @@ import com.epam.reportportal.listeners.LogLevel;
 import com.epam.reportportal.message.ReportPortalMessage;
 import com.epam.reportportal.service.Launch;
 import com.epam.reportportal.service.ReportPortal;
-import com.google.common.io.ByteSource;
+import com.epam.reportportal.utils.files.ByteSource;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 
