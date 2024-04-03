@@ -37,10 +37,12 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.epam.reportportal:client-java:5.2.4'
+    compileOnly "com.epam.reportportal:client-java:${client_version}"
+    compileOnly "com.codeborne:selenide:${selenide_version}"
     implementation 'com.google.code.findbugs:jsr305:3.0.2'
-    implementation 'com.codeborne:selenide:6.19.1'
 
+    testImplementation "com.codeborne:selenide:${selenide_version}"
+    testImplementation "com.epam.reportportal:client-java:${client_version}"
     testImplementation 'com.epam.reportportal:agent-java-test-utils:0.0.2'
 
     testImplementation("org.junit.platform:junit-platform-runner:${junit5_runner_version}") {

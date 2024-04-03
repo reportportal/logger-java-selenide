@@ -1,6 +1,10 @@
 # Changelog
 
 ## [Unreleased]
+### Changed
+- Client version updated on [5.2.11](https://github.com/reportportal/client-java/releases/tag/5.2.11), by @HardNorth
+- `client-java` dependency marked as `compileOnly`, by @HardNorth
+- `selenide` dependency marked as `compileOnly`, by @HardNorth
 
 ## [5.2.1]
 ### Changed
