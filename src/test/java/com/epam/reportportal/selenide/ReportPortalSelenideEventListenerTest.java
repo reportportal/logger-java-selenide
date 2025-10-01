@@ -32,8 +32,8 @@ import java.util.logging.Level;
 import static java.util.Optional.ofNullable;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
 import static org.mockito.internal.verification.VerificationModeFactory.noInteractions;
 
 public class ReportPortalSelenideEventListenerTest {
@@ -69,10 +69,12 @@ public class ReportPortalSelenideEventListenerTest {
 	@SuppressWarnings("unchecked")
 	private List<Function<String, SaveLogRQ>> runEventCapture(Consumer<LogEvent> eventConsumer, LogEvent logEvent) {
 		ArgumentCaptor<Function<String, SaveLogRQ>> logCapture = ArgumentCaptor.forClass(Function.class);
-		runEvent(eventConsumer, logEvent, mock -> {
-			mock.when(LoggingContext::context).thenReturn(context);
-			doNothing().when(context).emit(logCapture.capture());
-		});
+		runEvent(
+				eventConsumer, logEvent, mock -> {
+					mock.when(LoggingContext::context).thenReturn(context);
+					doNothing().when(context).emit(logCapture.capture());
+				}
+		);
 		return logCapture.getAllValues();
 	}
 
@@ -110,7 +112,7 @@ public class ReportPortalSelenideEventListenerTest {
 	}
 
 	@Test
-	@SuppressWarnings({ "ResultOfMethodCallIgnored", "unchecked" })
+	@SuppressWarnings({ "unchecked" })
 	public void test_step_logging_failed() {
 		LogEvent logEvent = mock(SelenideLog.class);
 		when(logEvent.toString()).thenReturn(SELENIDE_LOG_STRING);
@@ -191,7 +193,7 @@ public class ReportPortalSelenideEventListenerTest {
 	}
 
 	@Test
-	@SuppressWarnings({ "ResultOfMethodCallIgnored", "unchecked" })
+	@SuppressWarnings({ "unchecked" })
 	public void test_step_logging_failed_browser_logs() {
 		String logType = LogType.BROWSER;
 		Level logLevel = Level.FINER;
@@ -228,7 +230,7 @@ public class ReportPortalSelenideEventListenerTest {
 	}
 
 	@Test
-	@SuppressWarnings({ "ResultOfMethodCallIgnored", "unchecked" })
+	@SuppressWarnings({ "unchecked" })
 	public void test_step_logging_failed_screenshot_exception() {
 		String exceptionMessage = "my exception message";
 		LogEvent logEvent = mock(SelenideLog.class);
@@ -258,7 +260,7 @@ public class ReportPortalSelenideEventListenerTest {
 	}
 
 	@Test
-	@SuppressWarnings({ "ResultOfMethodCallIgnored", "unchecked" })
+	@SuppressWarnings({ "unchecked" })
 	public void test_step_logging_failed_page_source_exception() {
 		String exceptionMessage = "my exception message";
 		LogEvent logEvent = mock(SelenideLog.class);

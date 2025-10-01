@@ -27,10 +27,10 @@ import com.epam.reportportal.message.ReportPortalMessage;
 import com.epam.reportportal.service.Launch;
 import com.epam.reportportal.service.ReportPortal;
 import com.epam.reportportal.utils.files.ByteSource;
+import jakarta.annotation.Nonnull;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 
-import jakarta.annotation.Nonnull;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.*;
@@ -178,10 +178,7 @@ public class ReportPortalSelenideEventListener implements LogEventListener {
 	}
 
 	private void attachBinary(@Nonnull String message, @Nonnull byte[] attachment, @Nonnull String type) {
-		ReportPortal.emitLog(new ReportPortalMessage(ByteSource.wrap(attachment), type, message),
-				logLevel,
-				Instant.now()
-		);
+		ReportPortal.emitLog(new ReportPortalMessage(ByteSource.wrap(attachment), type, message), logLevel, Instant.now());
 	}
 
 	private void logScreenshot() {
@@ -192,10 +189,7 @@ public class ReportPortalSelenideEventListener implements LogEventListener {
 					attachBinary(SCREENSHOT_MESSAGE, screenshot, SELENIUM_SCREENSHOT_TYPE);
 				}
 			} catch (Exception e) {
-				ReportPortal.emitLog("Unable to get WebDriver screenshot: " + e.getMessage(),
-						LogLevel.ERROR.name(),
-						Instant.now()
-				);
+				ReportPortal.emitLog("Unable to get WebDriver screenshot: " + e.getMessage(), LogLevel.ERROR.name(), Instant.now());
 			}
 		}
 	}
@@ -208,10 +202,7 @@ public class ReportPortalSelenideEventListener implements LogEventListener {
 					attachBinary(PAGE_SOURCE_MESSAGE, pageSource.getBytes(StandardCharsets.UTF_8), SELENIUM_PAGE_SOURCE_TYPE);
 				}
 			} catch (Exception e) {
-				ReportPortal.emitLog("Unable to get WebDriver page source: " + e.getMessage(),
-						LogLevel.ERROR.name(),
-						Instant.now()
-				);
+				ReportPortal.emitLog("Unable to get WebDriver page source: " + e.getMessage(), LogLevel.ERROR.name(), Instant.now());
 			}
 		}
 	}
@@ -240,7 +231,8 @@ public class ReportPortalSelenideEventListener implements LogEventListener {
 		} else if (LogEvent.EventStatus.PASS.equals(currentLog.getStatus())) {
 			ofNullable(Launch.currentLaunch()).ifPresent(l -> l.getStepReporter().finishPreviousStep());
 		} else {
-			ReportPortal.emitLog("Unable to process selenide event status, skipping it: " + currentLog.getStatus(),
+			ReportPortal.emitLog(
+					"Unable to process selenide event status, skipping it: " + currentLog.getStatus(),
 					LogLevel.WARN.name(),
 					Instant.now()
 			);
