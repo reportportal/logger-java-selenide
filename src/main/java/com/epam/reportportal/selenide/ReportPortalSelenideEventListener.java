@@ -30,8 +30,9 @@ import com.epam.reportportal.utils.files.ByteSource;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.*;
 import java.util.function.Function;
 import java.util.logging.Level;
@@ -179,7 +180,7 @@ public class ReportPortalSelenideEventListener implements LogEventListener {
 	private void attachBinary(@Nonnull String message, @Nonnull byte[] attachment, @Nonnull String type) {
 		ReportPortal.emitLog(new ReportPortalMessage(ByteSource.wrap(attachment), type, message),
 				logLevel,
-				Calendar.getInstance().getTime()
+				Instant.now()
 		);
 	}
 
@@ -193,7 +194,7 @@ public class ReportPortalSelenideEventListener implements LogEventListener {
 			} catch (Exception e) {
 				ReportPortal.emitLog("Unable to get WebDriver screenshot: " + e.getMessage(),
 						LogLevel.ERROR.name(),
-						Calendar.getInstance().getTime()
+						Instant.now()
 				);
 			}
 		}
@@ -209,7 +210,7 @@ public class ReportPortalSelenideEventListener implements LogEventListener {
 			} catch (Exception e) {
 				ReportPortal.emitLog("Unable to get WebDriver page source: " + e.getMessage(),
 						LogLevel.ERROR.name(),
-						Calendar.getInstance().getTime()
+						Instant.now()
 				);
 			}
 		}
@@ -241,7 +242,7 @@ public class ReportPortalSelenideEventListener implements LogEventListener {
 		} else {
 			ReportPortal.emitLog("Unable to process selenide event status, skipping it: " + currentLog.getStatus(),
 					LogLevel.WARN.name(),
-					Calendar.getInstance().getTime()
+					Instant.now()
 			);
 			ofNullable(Launch.currentLaunch()).ifPresent(l -> l.getStepReporter().finishPreviousStep(ItemStatus.WARN));
 		}
