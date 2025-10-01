@@ -1,10 +1,16 @@
 # Changelog
-### Changed
-- Client version updated on [5.3.14](https://github.com/reportportal/client-java/releases/tag/5.3.14), by @HardNorth
 
 ## [Unreleased]
+### Changed
+- Client version updated on [5.4.3](https://github.com/reportportal/client-java/releases/tag/5.4.3), by @HardNorth
+- Replace "jsr305" annotations with "jakarta.annotation-api", by @HardNorth
+- Switch on use of `Instant` class instead of `Date` to get more timestamp precision, by @HardNorth
+### Removed
+- Java 8, 9, 10 support, by @HardNorth
 
 ## [5.3.0]
+### Changed
+- Client version updated on [5.3.14](https://github.com/reportportal/client-java/releases/tag/5.3.14), by @HardNorth
 
 ## [5.2.3]
 ### Changed
